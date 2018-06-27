@@ -70,10 +70,10 @@ class BaiduImageClawer(object):
         :return:
         """
         assert len(IMG_FMT) > 0
-        pattern = ur'('
+        pattern = r'('
         for fmt in IMG_FMT:
             pattern += 'http:\/\/[^\s,"]*\.%s|https:\/\/[^\s,"]*\.%s|' % (fmt, fmt)
-        pattern = pattern[:-1] + ur')'
+        pattern = pattern[:-1] + r')'
         pattern = re.compile(pattern)
         self.img_urls = re.findall(pattern, html)
 
@@ -91,7 +91,7 @@ class BaiduImageClawer(object):
         # 若请求成功,首先跟新img url列表
         self.get_img_urls(html)
         # 若请求成功，跟新待爬取URL列表
-        pattern = re.compile(ur'(\/search\/flip[^\s,"]*height=0)')
+        pattern = re.compile(r'(\/search\/flip[^\s,"]*height=0)')
         re_res = re.findall(pattern, html)
         for res in re_res:
             url_todo_tmp = 'http://image.baidu.com' + res
@@ -150,7 +150,7 @@ class BaiduImageClawer(object):
             self.img_urls_claw()
 
 
-def img_claw_subpro(search_word, label_id, label_name, json_file, output_path, page_num):
+def img_claw_subpro((search_word, label_id, label_name, json_file, output_path, page_num)):
     claw_obj = BaiduImageClawer(search_word, label_id, label_name, json_file, output_path, page_num)
     claw_obj.do_claw()
 
@@ -163,5 +163,5 @@ if __name__ == "__main__":
     output_path = "./test"
     page_num = 10
 
-    claw_obj = BaiduImageClawer(search_word, label_id, label_name, json_file, output_path, page_num)
+    claw_obj = BaiduImageClawer((search_word, label_id, label_name, json_file, output_path, page_num))
     claw_obj.do_claw()

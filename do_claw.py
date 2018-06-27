@@ -5,9 +5,9 @@ main
 
 """
 import os
-from multiprocessing import Process
+from multiprocessing import Pool
 
-from config import PAGE_NUM, BASE_IMAGE_PATH, BASE_JSON_PATH
+from config import PAGE_NUM, BASE_IMAGE_PATH, BASE_JSON_PATH, MULTIPROCESS_NUM
 from claw_subpro import img_claw_subpro
 
 def load_task(filepath):
@@ -33,19 +33,16 @@ def main(filepath = "label40.txt"):
     """
     search_word_list, label_name_list, label_id_list = load_task(filepath)
 
-    pool = list()
-    for i in range(len(search_word_list)):
-        proc = Process(target = img_claw_subpro, args=(search_word_list[i],
-                                                       label_id_list[i],
-                                                       label_name_list[i],
-                                                       os.path.join(BASE_JSON_PATH, label_name_list[i]+".json"),
-                                                       os.path.join(BASE_IMAGE_PATH, "spider" + label_name_list[i]),
-                                                       PAGE_NUM))
-        pool.append(proc)
-        proc.start()
+    pool = Pool(MULTIPROCESS_NUM)
 
-    for proc in pool:
-        proc.join()
+    _ = pool.map(img_claw_subpro, [(search_word_list[i],
+                                   label_id_list[i],
+                                   label_name_list[i],
+                                   os.path.join(BASE_JSON_PATH, label_name_list[i]+".json"),
+                                   os.path.join(BASE_IMAGE_PATH, "spider_" + label_name_list[i]),
+                                   PAGE_NUM) for i in range(len(search_word_list))])
+    pool.close()
+    pool.join()
 
 
 if __name__ == "__main__":
